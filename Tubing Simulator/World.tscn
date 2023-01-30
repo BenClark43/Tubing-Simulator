@@ -1,0 +1,122 @@
+[gd_scene load_steps=14 format=2]
+
+[ext_resource path="res://Hook.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Block.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Chain-Link.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Star.tscn" type="PackedScene" id=4]
+[ext_resource path="res://Block.gd" type="Script" id=5]
+[ext_resource path="res://Lake.jpg" type="Texture" id=6]
+[ext_resource path="res://HUD.tscn" type="PackedScene" id=7]
+[ext_resource path="res://World.gd" type="Script" id=8]
+
+[sub_resource type="PhysicsMaterial" id=1]
+friction = 0.0
+bounce = 0.44
+
+[sub_resource type="RectangleShape2D" id=2]
+extents = Vector2( 517.5, 16 )
+
+[sub_resource type="RectangleShape2D" id=3]
+extents = Vector2( 517, 21 )
+
+[sub_resource type="RectangleShape2D" id=4]
+extents = Vector2( 19, 298 )
+
+[sub_resource type="RectangleShape2D" id=5]
+extents = Vector2( 18.5, 304.5 )
+
+[node name="World" type="Node"]
+script = ExtResource( 8 )
+star_scene = ExtResource( 4 )
+
+[node name="Lake" type="Sprite" parent="."]
+position = Vector2( 511.5, 300.5 )
+scale = Vector2( 1.49265, 1.30217 )
+texture = ExtResource( 6 )
+
+[node name="ChainContainer" type="Node2D" parent="."]
+
+[node name="Boat" parent="ChainContainer" instance=ExtResource( 2 )]
+position = Vector2( 660, 196 )
+script = ExtResource( 5 )
+
+[node name="Chain-Link" parent="ChainContainer" instance=ExtResource( 3 )]
+position = Vector2( 660, 244 )
+collision_layer = 0
+collision_mask = 0
+mass = 0.00102041
+
+[node name="PinJoint2D" type="PinJoint2D" parent="ChainContainer"]
+position = Vector2( 659, 222 )
+node_a = NodePath("../Boat")
+node_b = NodePath("../Chain-Link")
+softness = 1.0
+
+[node name="Chain-Link2" parent="ChainContainer" instance=ExtResource( 3 )]
+position = Vector2( 660, 287 )
+collision_layer = 0
+collision_mask = 0
+mass = 0.00102041
+
+[node name="PinJoint2D2" type="PinJoint2D" parent="ChainContainer"]
+position = Vector2( 659, 266 )
+node_a = NodePath("../Chain-Link")
+node_b = NodePath("../Chain-Link2")
+softness = 1.0
+
+[node name="Chain-Link3" parent="ChainContainer" instance=ExtResource( 3 )]
+position = Vector2( 660, 330 )
+collision_layer = 0
+collision_mask = 0
+mass = 0.00102041
+
+[node name="PinJoint2D3" type="PinJoint2D" parent="ChainContainer"]
+position = Vector2( 659, 309 )
+node_a = NodePath("../Chain-Link2")
+node_b = NodePath("../Chain-Link3")
+softness = 1.0
+
+[node name="PinJoint2D4" type="PinJoint2D" parent="ChainContainer"]
+position = Vector2( 659, 351 )
+node_a = NodePath("../Chain-Link3")
+node_b = NodePath("../Hook")
+
+[node name="Hook" parent="ChainContainer" instance=ExtResource( 1 )]
+position = Vector2( 658, 367 )
+mass = 0.01
+physics_material_override = SubResource( 1 )
+gravity_scale = 0.0
+linear_damp = 3.0
+
+[node name="Beach" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Beach"]
+position = Vector2( 509, 614 )
+shape = SubResource( 2 )
+
+[node name="TreesTop" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TreesTop"]
+position = Vector2( 522, -19 )
+shape = SubResource( 3 )
+
+[node name="TreesLeft" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TreesLeft"]
+position = Vector2( -16, 304 )
+shape = SubResource( 4 )
+
+[node name="TreesRight" type="StaticBody2D" parent="."]
+position = Vector2( -2, 4 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TreesRight"]
+position = Vector2( 1039, 297 )
+shape = SubResource( 5 )
+
+[node name="HUD" parent="." instance=ExtResource( 7 )]
+
+[node name="RigidBody2D" parent="." instance=ExtResource( 4 )]
+position = Vector2( 268, 212 )
+
+[connection signal="hit" from="RigidBody2D" to="." method="_on_Star_hit"]
+[connection signal="point" from="RigidBody2D" to="HUD" method="score_point"]
